@@ -107,13 +107,86 @@ function SetInitialClothes(initial)
     ClearPedDecorations(ped)
 end
 
+local ClotheListPropsStart = {
+    ["hat"] = {-99, -99},
+    ["glasses"] = {-99, -99},
+    ["earrings"] = {-99, -99},
+    ["watch"] = {-99, -99},
+    ["bracelet"] = {-99, -99},
+}
+local ClotheListComponentsStart = {
+    ["mask"] = {-99, -99},
+    ["chain"] = {-99, -99},
+    ["undershirt"] = {-99, -99},
+    ["jacket"] = {-99, -99},
+    ["bodyarmor"] = {-99, -99},
+    ["bag"] = {-99, -99},
+    ["pants"] = {-99, -99},
+    ["shoes"] = {-99, -99},
+    ["gloves"] = {-99, -99}, 
+}
+
+function AddToListComponentStart(clothing)
+    if clothing.component_id == 1 then
+        ClotheListComponentsStart["mask"] = {clothing.drawable, clothing.texture}
+    elseif clothing.component_id == 7 then
+        ClotheListComponentsStart["chain"] = {clothing.drawable, clothing.texture}
+    elseif clothing.component_id == 8 then
+        ClotheListComponentsStart["undershirt"] = {clothing.drawable, clothing.texture}
+    elseif clothing.component_id == 11 then
+        ClotheListComponentsStart["jacket"] = {clothing.drawable, clothing.texture}
+    elseif clothing.component_id == 9 then
+        ClotheListComponentsStart["bodyarmor"] = {clothing.drawable, clothing.texture}
+    elseif clothing.component_id == 5 then
+        ClotheListComponentsStart["bag"] = {clothing.drawable, clothing.texture}
+    elseif clothing.component_id == 4 then
+        ClotheListComponentsStart["pants"] = {clothing.drawable, clothing.texture}
+    elseif clothing.component_id == 6 then
+        ClotheListComponentsStart["shoes"] = {clothing.drawable, clothing.texture}
+    elseif clothing.component_id == 3 then
+        ClotheListComponentsStart["gloves"] = {clothing.drawable, clothing.texture}
+    else
+        --print('Clothing script ERROR | Contact owner | Susiekite su administracija.' .. clothing.component_id)
+    end
+end
+
+function AddToListPropsStart(clothing)
+    if clothing.prop_id == 0 then
+        ClotheListPropsStart["hat"] = {clothing.drawable, clothing.texture}
+    elseif clothing.prop_id == 1 then
+        ClotheListPropsStart["glasses"] = {clothing.drawable, clothing.texture}
+    elseif clothing.prop_id == 2 then
+        ClotheListPropsStart["earrings"] = {clothing.drawable, clothing.texture}
+    elseif clothing.prop_id == 6 then
+        ClotheListPropsStart["watch"] = {clothing.drawable, clothing.texture}
+    elseif clothing.prop_id == 7 then
+        ClotheListPropsStart["bracelet"] = {clothing.drawable, clothing.texture}
+    else
+        --print('Clothing script ERROR | Contact owner | Susiekite su administracija.' .. clothing.prop_id)
+    end
+end
+
 function InitializeCharacter(gender, onSubmit, onCancel)
     SetInitialClothes(Config.InitialPlayerClothes[gender])
     local config = getNewCharacterConfig()
     TriggerServerEvent("illenium-appearance:server:ChangeRoutingBucket")
     client.startPlayerCustomization(function(appearance)
         if (appearance) then
-            TriggerServerEvent("illenium-appearance:server:saveAppearance", appearance)
+            --TriggerServerEvent("illenium-appearance:server:saveAppearance", appearance)
+            for k,v in pairs(appearance) do
+                if k == 'props' then
+                    for _,goku in pairs(v) do
+                        AddToListPropsStart(goku)
+                    end
+                elseif k == 'components' then
+                    for z,zooparkas in pairs(v) do
+                        AddToListComponentStart(zooparkas)
+                    end
+                end
+            end
+            TriggerServerEvent("clothes:GiveFirstClothing", ClotheListPropsStart, ClotheListComponentsStart)
+            exports['ms-itemclothes']:clearSkin()
+
             if onSubmit then
                 onSubmit()
             end
@@ -141,8 +214,14 @@ function OpenShop(config, isPedMenu, shopType)
             if appearance then
                 if not isPedMenu then
                     TriggerServerEvent("illenium-appearance:server:chargeCustomer", shopType)
+                    if shopType == 'clothing' then
+                        TriggerEvent("illenium-appearance:client:reloadSkin")
+                    else
+                        TriggerServerEvent("illenium-appearance:server:saveAppearance", appearance)
+                    end
+                else
+                    TriggerServerEvent("illenium-appearance:server:saveAppearance", appearance)
                 end
-                TriggerServerEvent("illenium-appearance:server:saveAppearance", appearance)
             else
                 lib.notify({
                     title = _L("cancelled.title"),
@@ -720,6 +799,8 @@ RegisterNetEvent("illenium-appearance:client:reloadSkin", function(bypassChecks)
 
     reloadSkinTimer = GetGameTimer()
     BackupPlayerStats()
+
+    exports['ms-itemclothes']:canChangeClothes(true)
 
     lib.callback("illenium-appearance:server:getAppearance", false, function(appearance)
         if not appearance then

@@ -170,6 +170,20 @@ RegisterServerEvent("illenium-appearance:server:saveAppearance", function(appear
     end
 end)
 
+RegisterServerEvent("clothes:GiveFirstClothing", function(Props, Comps)
+    local src = source
+    for k, v in pairs(Comps) do
+        if tonumber(v[2]) ~= -99 and tonumber(v[1]) ~= -99 then
+            exports.ox_inventory:AddItem(src, k, 1, { texture = tonumber(v[2]), drawable = tonumber(v[1]) })
+        end
+    end
+    for k, v in pairs(Props) do
+        if tonumber(v[2]) ~= -99 and tonumber(v[1]) ~= -99 then
+            exports.ox_inventory:AddItem(src, k, 1, { texture = tonumber(v[2]), drawable = tonumber(v[1]) })
+        end
+    end
+end)
+
 RegisterServerEvent("illenium-appearance:server:chargeCustomer", function(shopType)
     local src = source
     local money = getMoneyForShop(shopType)
@@ -180,6 +194,20 @@ RegisterServerEvent("illenium-appearance:server:chargeCustomer", function(shopTy
             type = "success",
             position = Config.NotifyOptions.position
         })
+        if shopType == 'clothing' then
+            local tableClothingProp = lib.callback.await('ms:GetClothingListProp', src)
+            local tableClothingComp = lib.callback.await('ms:GetClothingListComp', src)
+            for k, v in pairs(tableClothingComp) do
+                if tonumber(v[2]) ~= -99 and tonumber(v[1]) ~= -99 then
+                    exports.ox_inventory:AddItem(src, k, 1, { texture = tonumber(v[2]), drawable = tonumber(v[1]) })
+                end
+            end
+            for k, v in pairs(tableClothingProp) do
+                if tonumber(v[2]) ~= -99 and tonumber(v[1]) ~= -99 then
+                    exports.ox_inventory:AddItem(src, k, 1, { texture = tonumber(v[2]), drawable = tonumber(v[1]) })
+                end
+            end
+        end
     else
         lib.notify(src, {
             title = _L("purchase.store.failure.title"),
@@ -254,7 +282,7 @@ RegisterNetEvent("illenium-appearance:server:saveManagementOutfit", function(out
 
     lib.notify(src, {
         title = _L("outfits.save.success.title"),
-            description = string.format(_L("outfits.save.success.description"), outfitData.Name),
+        description = string.format(_L("outfits.save.success.description"), outfitData.Name),
         type = "success",
         position = Config.NotifyOptions.position
     })

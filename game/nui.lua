@@ -45,13 +45,84 @@ RegisterNUICallback("appearance_change_model", function(model, cb)
     })
 end)
 
+local ClotheListComponents = {
+    ["mask"] = { -99, -99 },
+    ["chain"] = { -99, -99 },
+    ["undershirt"] = { -99, -99 },
+    ["jacket"] = { -99, -99 },
+    ["bodyarmor"] = { -99, -99 },
+    ["bag"] = { -99, -99 },
+    ["pants"] = { -99, -99 },
+    ["shoes"] = { -99, -99 },
+    ["gloves"] = { -99, -99 },
+}
+
+function AddToListComponent(clothing)
+    if clothing.component_id == 1 then
+        ClotheListComponents["mask"] = { clothing.drawable, clothing.texture }
+    elseif clothing.component_id == 7 then
+        ClotheListComponents["chain"] = { clothing.drawable, clothing.texture }
+    elseif clothing.component_id == 8 then
+        ClotheListComponents["undershirt"] = { clothing.drawable, clothing.texture }
+    elseif clothing.component_id == 11 then
+        ClotheListComponents["jacket"] = { clothing.drawable, clothing.texture }
+    elseif clothing.component_id == 9 then
+        ClotheListComponents["bodyarmor"] = { clothing.drawable, clothing.texture }
+    elseif clothing.component_id == 5 then
+        ClotheListComponents["bag"] = { clothing.drawable, clothing.texture }
+    elseif clothing.component_id == 4 then
+        ClotheListComponents["pants"] = { clothing.drawable, clothing.texture }
+    elseif clothing.component_id == 6 then
+        ClotheListComponents["shoes"] = { clothing.drawable, clothing.texture }
+    elseif clothing.component_id == 3 then
+        ClotheListComponents["gloves"] = { clothing.drawable, clothing.texture }
+    else
+        print('Clothing script ERROR | Contact owner | Susiekite su administracija.')
+    end
+end
+
+local ClotheListProps = {
+    ["hat"] = { -99, -99 },
+    ["glasses"] = { -99, -99 },
+    ["earrings"] = { -99, -99 },
+    ["watch"] = { -99, -99 },
+    ["bracelet"] = { -99, -99 },
+}
+
+function AddToListProps(clothing)
+    if clothing.prop_id == 0 then
+        ClotheListProps["hat"] = { clothing.drawable, clothing.texture }
+    elseif clothing.prop_id == 1 then
+        ClotheListProps["glasses"] = { clothing.drawable, clothing.texture }
+    elseif clothing.prop_id == 2 then
+        ClotheListProps["earrings"] = { clothing.drawable, clothing.texture }
+    elseif clothing.prop_id == 6 then
+        ClotheListProps["watch"] = { clothing.drawable, clothing.texture }
+    elseif clothing.prop_id == 7 then
+        ClotheListProps["bracelet"] = { clothing.drawable, clothing.texture }
+    else
+        print('Clothing script ERROR | Contact owner | Susiekite su administracija.')
+    end
+end
+
+lib.callback.register('ms:GetClothingListComp', function()
+    return ClotheListComponents
+end)
+
+lib.callback.register('ms:GetClothingListProp', function()
+    return ClotheListProps
+end)
+
+
 RegisterNUICallback("appearance_change_component", function(component, cb)
     client.setPedComponent(cache.ped, component)
+    AddToListComponent(component)
     cb(client.getComponentSettings(cache.ped, component.component_id))
 end)
 
 RegisterNUICallback("appearance_change_prop", function(prop, cb)
     client.setPedProp(cache.ped, prop)
+    AddToListProps(prop)
     cb(client.getPropSettings(cache.ped, prop.prop_id))
 end)
 
@@ -114,11 +185,49 @@ RegisterNUICallback("appearance_save", function(appearance, cb)
     client.wearClothes(appearance, "body")
     client.wearClothes(appearance, "bottom")
     client.exitPlayerCustomization(appearance)
+    Wait(250)
+    ClotheListComponents = {
+        ["mask"] = { -99, -99 },
+        ["chain"] = { -99, -99 },
+        ["undershirt"] = { -99, -99 },
+        ["jacket"] = { -99, -99 },
+        ["bodyarmor"] = { -99, -99 },
+        ["bag"] = { -99, -99 },
+        ["pants"] = { -99, -99 },
+        ["shoes"] = { -99, -99 },
+        ["gloves"] = { -99, -99 },
+    }
+    ClotheListProps = {
+        ["hat"] = { -99, -99 },
+        ["glasses"] = { -99, -99 },
+        ["earrings"] = { -99, -99 },
+        ["watch"] = { -99, -99 },
+        ["bracelet"] = { -99, -99 },
+    }
 end)
 
 RegisterNUICallback("appearance_exit", function(_, cb)
     cb(1)
     client.exitPlayerCustomization()
+    Wait(250)
+    ClotheListComponents = {
+        ["mask"] = { -99, -99 },
+        ["chain"] = { -99, -99 },
+        ["undershirt"] = { -99, -99 },
+        ["jacket"] = { -99, -99 },
+        ["bodyarmor"] = { -99, -99 },
+        ["bag"] = { -99, -99 },
+        ["pants"] = { -99, -99 },
+        ["shoes"] = { -99, -99 },
+        ["gloves"] = { -99, -99 },
+    }
+    ClotheListProps = {
+        ["hat"] = { -99, -99 },
+        ["glasses"] = { -99, -99 },
+        ["earrings"] = { -99, -99 },
+        ["watch"] = { -99, -99 },
+        ["bracelet"] = { -99, -99 },
+    }
 end)
 
 RegisterNUICallback("rotate_left", function(_, cb)
